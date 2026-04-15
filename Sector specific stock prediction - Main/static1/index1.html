@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOCK PREDICTOR-NASDAQ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f0f2f5 0%, #e0e4ea 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .top-header {
+            background: linear-gradient(90deg, #5e2bb8 0%, #a62cc2 100%);
+            width: 100%;
+            height: 150px; /* Adjusted height to fit the text and wave */
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .top-header h1 {
+            margin: 0;
+            font-size: 36px;
+            font-weight: 600;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+        .wave-pattern {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: repeating-linear-gradient(
+                135deg,
+                transparent 0,
+                transparent 10px,
+                rgba(255, 255, 255, 0.2) 10px,
+                rgba(255, 255, 255, 0.2) 20px
+            ), linear-gradient(to bottom, #6b2aa7, #9b59b6);
+            opacity: 0.7;
+            animation: wave 25s infinite linear;
+        }
+        @keyframes wave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50px); }
+        }
+        .prediction-box {
+            background-color: white;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px 40px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .prediction-box h1 {
+            margin: 0 0 20px 0;
+            font-size: 28px;
+            font-weight: 600;
+            color: #5e2bb8;
+            border-bottom: 2px solid #5e2bb8;
+            padding-bottom: 5px;
+        }
+        label {
+            display: block;
+            margin: 15px 0 8px;
+            font-weight: 500;
+            color: #34495e;
+        }
+        select, input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        select:focus, input[type="text"]:focus, input[type="date"]:focus {
+            border-color: #5e2bb8;
+            box-shadow: 0 0 5px rgba(94, 43, 184, 0.3);
+            outline: none;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.3s ease, transform 0.2s ease;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        #predicting {
+            display: none;
+            text-align: center;
+            color: #007bff;
+            font-size: 18px;
+            margin: 20px 0;
+            font-weight: 500;
+            animation: pulse 1.5s infinite;
+        }
+        #error {
+            color: #e74c3c;
+            margin-top: 10px;
+            display: none;
+            text-align: center;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 4px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @media (max-width: 600px) {
+            .top-header h1 {
+                font-size: 24px;
+            }
+            .prediction-box {
+                padding: 15px 20px;
+            }
+            .prediction-box h1 {
+                font-size: 22px;
+            }
+            button {
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-header">
+        <h1>STOCK PREDICTOR - NASDAQ</h1>
+        <div class="wave-pattern"></div>
+    </div>
+    <div class="prediction-box">
+        <h1>Stock Prediction</h1>
+        <form id="stockForm">
+            <label for="sector">Select Sector:</label>
+            <select id="sector" name="sector">
+                <option value="Energy">Energy</option>
+                <option value="Materials">Materials</option>
+                <option value="Industrials">Industrials</option>
+                <option value="Utilities">Utilities</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Financials">Financials</option>
+                <option value="Consumer Discretionary">Consumer Discretionary</option>
+                <option value="Consumer Staples">Consumer Staples</option>
+                <option value="Real Estate">Real Estate</option>
+                <option value="Technology">Technology</option>
+                <option value="Communication Services">Communication Services</option>
+            </select>
+
+            <label for="ticker">Stock Ticker:</label>
+            <input type="text" id="ticker" name="ticker" placeholder="e.g., AAPL" required>
+
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" name="startDate" required>
+
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate" name="endDate" required>
+
+            <label for="predictionRange">Prediction Range:</label>
+            <select id="predictionRange" name="predictionRange">
+                <option value="1week">1 Week</option>
+                <option value="1month">1 Month</option>
+                <option value="3months">3 Months</option>
+            </select>
+
+            <button type="submit">Predict</button>
+        </form>
+        <div id="predicting">Predicting...</div>
+        <div id="error"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('stockForm');
+        const predictingDiv = document.getElementById('predicting');
+        const errorDiv = document.getElementById('error');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            predictingDiv.style.display = 'block';
+
+            const sector = document.getElementById('sector').value;
+            const ticker = document.getElementById('ticker').value.toUpperCase();
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const predictionRange = document.getElementById('predictionRange').value;
+
+            if (new Date(startDate) >= new Date(endDate)) {
+                showError('Start date must be before end date.');
+                predictingDiv.style.display = 'none';
+                return;
+            }
+            if (new Date(endDate) > new Date()) {
+                showError('End date cannot be in the future.');
+                predictingDiv.style.display = 'none';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5000/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sector, ticker, startDate, endDate, predictionRange })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Request failed');
+                }
+
+                const data = await response.json();
+                const queryString = new URLSearchParams({ data: encodeURIComponent(JSON.stringify(data)) }).toString();
+                window.location.href = `/results?${queryString}`;
+            } catch (err) {
+                showError(err.message || 'Something went wrong. Please try again.');
+            } finally {
+                predictingDiv.style.display = 'none';
+            }
+        });
+
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+    </script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9315475db8d73789',t:'MTc0NDgyMzI0NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>
