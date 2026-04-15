@@ -64,9 +64,6 @@ cd Stock-Predictor-Nasdaq
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
-# Install dependencies
-pip install -r requirements.txt
-
 # Run the web app (example command; adjust to your framework)
 python app.py
 # or
@@ -81,16 +78,9 @@ Open the URL shown in the terminal (e.g., `http://127.0.0.1:8000`) and use the U
 
 ```text
 Stock-Predictor-Nasdaq/
-├─ app/ or src/
-│  ├─ web/              # Frontend templates / static files
-│  ├─ api/              # Routes / controllers for requests
-│  ├─ models/           # Saved models per sector
-│  ├─ preprocessing/    # Feature engineering & transforms
-│  └─ utils/            # Common utilities (Yahoo Finance, etc.)
-├─ notebooks/           # EDA and experiments
-├─ configs/             # Config files for sectors, models, etc.
-├─ requirements.txt
-├─ app.py / main.py     # Web app entry point
+│  ├─ static1              # Frontend templates / static file
+│  ├─ model1           # Saved models per sector   
+├─ app1.py    # Web app entry point
 └─ README.md
 ```
 
